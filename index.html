@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jeweller Gold Calculator</title>
+  
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: rgba(128, 128, 128, 0.43);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .calculator {
+      background: linear-gradient(to left, #f6d465c1, #ff8d6d);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 400px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative; /* This will allow the button to be positioned relative to the calculator container */
+    }
+
+    .display {
+      font-size: 24px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+      min-height: 40px;
+    }
+
+    .result {
+      margin-top: 2px;
+      font-size: 16px;
+      font-weight: bold;
+      min-height: 30px;
+      border-radius: 20px;
+      background: linear-gradient(to left, #f6d465c1, #ff8d6d);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .buttons button {
+      font-size: 18px;
+      height: 60px;
+      border-radius: 10px;
+    }
+
+    .extras button {
+      font-size: 14px;
+      margin: 1.5px;
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+
+    #conversionResult {
+      position: relative;
+      min-height: 60px;
+      padding: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      border: 1px solid #ccc;
+      border-radius: 15px;
+      background-color: aliceblue;
+    }
+
+    #conversionResult .converter-output {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .result-box {
+      flex: 1;
+      min-width: 100px;
+      background-color: #f0f0f0;
+      border-radius: 20px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .result-box .label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .result-box .value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #f57c00;
+    }
+
+    .modal-header button {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+    }
+
+    @media (max-width: 500px) {
+      body {
+        align-items: flex-start;
+        padding-top: 60px;
+      }
+
+      .buttons button {
+        font-size: 16px;
+        height: 50px;
+      }
+
+      .calculator {
+        width: 90%;
+        height: auto;
+        overflow: visible;
+        max-width: none;
+      }
+
+      .display {
+        font-size: 20px;
+      }
+
+      .result {
+        font-size: 14px;
+      }
+    }
+
+    /* Style for the Gold Purity button in top-right corner */
+    .gold-purity-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 14px;
+      background-color: #f57c00;
+      color: white;
+      border: none;
+      padding: 5px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <h2 class="text-center">Calculator</h2>
+
+  <div class="result" id="conversionResult">
+    <div>Grams: 0.00 gm</div>
+    <div class="converter-output mt-2">
+      <div class="result-box">
+        <span class="label">Tola</span>
+        <span class="value">0</span>
+      </div>
+      <div class="result-box">
+        <span class="label">Aani</span>
+        <span class="value">0</span>
+      </div>
+      <div class="result-box">
+        <span class="label">Rati</span>
+        <span class="value">0</span>
+      </div>
+      <div class="result-box">
+        <span class="label">Total Tola</span>
+        <span class="value">0.0000</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="display" id="display">0</div>
+
+  <div class="buttons">
+    <button class="btn btn-outline-secondary" onclick="append('%')"><i class="fas fa-percent"></i></button>
+    <button class="btn btn-outline-secondary" onclick="append('/')"><i class="fas fa-divide"></i></button>
+    <button class="btn btn-outline-secondary" onclick="backspace()"><i class="fas fa-backspace"></i></button>
+    <button class="btn btn-danger" onclick="clearAll()"><i class="fas fa-times"></i></button>
+
+    <button class="btn btn-light" onclick="append('7')">7</button>
+    <button class="btn btn-light" onclick="append('8')">8</button>
+    <button class="btn btn-light" onclick="append('9')">9</button>
+    <button class="btn btn-outline-secondary" onclick="append('*')"><i class="fas fa-times"></i></button>
+
+    <button class="btn btn-light" onclick="append('4')">4</button>
+    <button class="btn btn-light" onclick="append('5')">5</button>
+    <button class="btn btn-light" onclick="append('6')">6</button>
+    <button class="btn btn-outline-secondary" onclick="append('-')"><i class="fas fa-minus"></i></button>
+
+    <button class="btn btn-light" onclick="append('1')">1</button>
+    <button class="btn btn-light" onclick="append('2')">2</button>
+    <button class="btn btn-light" onclick="append('3')">3</button>
+    <button class="btn btn-outline-secondary" onclick="append('+')"><i class="fas fa-plus"></i></button>
+
+    <button class="btn btn-light" onclick="append('0')">0</button>
+    <button class="btn btn-light" onclick="append('00')">00</button>
+    <button class="btn btn-light" onclick="append('.')">.</button>
+    <button class="btn btn-success" onclick="calculate()"><i class="fas fa-equals"></i></button>
+  </div>
+
+  <!-- Gold Purity Button (Now positioned in the top-right corner of the calculator) -->
+  <button class="gold-purity-button" data-bs-toggle="modal" data-bs-target="#purityModal">Gold Purity</button>
+</div>
+
+<!-- Gold Purity Modal -->
+<div class="modal fade" id="purityModal" tabindex="-1" aria-labelledby="purityModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="purityModalLabel">Gold Purity Calculation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="purityInput" class="form-label"><strong>Enter Gold Purity (%)</strong></label>
+          <input type="number" id="purityInput" class="form-control" placeholder="e.g., 88, 91.6, 99.9" min="0" max="100" />
+        </div>
+        <button class="btn btn-primary w-100" onclick="calculatePurity()">Calculate Purity Breakdown</button>
+        <div id="purityResult" class="mt-3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap and FontAwesome Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  let input = '';
+
+  function append(value) {
+    const lastChar = input.slice(-1);
+    const operators = ['+', '-', '*', '/', '%'];
+    if (operators.includes(lastChar) && operators.includes(value)) {
+      input = input.slice(0, -1) + value;
+    } else {
+      input += value;
+    }
+    updateDisplay(input);
+  }
+
+  function clearAll() {
+    input = '';
+    updateDisplay('0');
+    document.getElementById('conversionResult').innerHTML = '';
+  }
+
+  function backspace() {
+    input = input.slice(0, -1);
+    if (input === '') input = '0';
+    updateDisplay(input);
+  }
+
+  function updateDisplay(value) {
+    document.getElementById('display').innerText = value || '0';
+  }
+
+  function calculate() {
+    try {
+      let result = eval(input); // Evaluates the mathematical expression
+
+      if (isNaN(result)) {
+        updateDisplay('Error');
+        return;
+      }
+
+      // Show arithmetic result in the display area
+      input = result.toString();
+      updateDisplay(input);
+
+      // Convert result to grams
+      let grams = result;
+
+      const tolaWeight = 11.664;  // 1 Tola = 11.664 grams
+      const aaniWeight = 0.7285;  // 1 Aani = 0.7285 grams
+      const ratiWeight = 0.1821;  // 1 Rati = 0.1821 grams
+
+      const tola = Math.floor(grams / tolaWeight);
+      const tolaDecimalPart = (grams / tolaWeight) - tola;
+      const aani = Math.round(tolaDecimalPart * (tolaWeight / aaniWeight));
+      const rati = Math.round(grams / ratiWeight);
+      const totalTola = (grams / tolaWeight).toFixed(4);
+
+      document.getElementById('conversionResult').innerHTML = `
+        <div>Grams: ${grams.toFixed(2)} gm</div>
+        <div class="converter-output mt-2">
+          <div class="result-box">
+            <span class="label">Tola</span>
+            <span class="value">${tola}</span>
+          </div>
+          <div class="result-box">
+            <span class="label">Aani</span>
+            <span class="value">${aani}</span>
+          </div>
+          <div class="result-box">
+            <span class="label">Rati</span>
+            <span class="value">${rati}</span>
+          </div>
+          <div class="result-box">
+            <span class="label">Total Tola</span>
+            <span class="value">${totalTola}</span>
+          </div>
+        </div>
+      `;
+    } catch {
+      updateDisplay('Error');
+    }
+  }
+
+  function calculatePurity() {
+    const purityValue = parseFloat(document.getElementById('purityInput').value);
+
+    if (isNaN(purityValue)) {
+      alert("Please enter a valid purity percentage.");
+      return;
+    }
+
+    const totalGrams = parseFloat(input); // current calculator input/result
+
+    if (isNaN(totalGrams)) {
+      alert("Please calculate the weight first.");
+      return;
+    }
+
+    const pureGold = (totalGrams * purityValue) / 100;
+    const otherMetal = totalGrams - pureGold;
+
+    document.getElementById('purityResult').innerHTML = `
+      <div class="converter-output mt-2">
+        <div class="result-box">
+          <span class="label">Selected Purity</span>
+          <span class="value">${purityValue}%</span>
+        </div>
+        <div class="result-box">
+          <span class="label">Pure Gold</span>
+          <span class="value">${pureGold.toFixed(2)} gm</span>
+        </div>
+        <div class="result-box">
+          <span class="label">Mixed Metal</span>
+          <span class="value">${otherMetal.toFixed(2)} gm</span>
+        </div>
+      </div>
+    `;
+  }
+</script>
+
+</body>
+</html>
